@@ -24,6 +24,7 @@
     <string name="status_sign_in_failed">Sign-in failed</string>
 
     <string name="firebase_status_fmt">Firebase UID: %s</string>
+    <string name="user_instruction_verify">Verify your email and reload the page to continue</string>
     <string name="firebase_user_management">Firebase User Management</string>
 
     <string name="google_status_fmt">Google User: %s</string>
@@ -32,7 +33,7 @@
     <string name="facebook_status_fmt">Facebook User: %s</string>
     <string name="facebook_title_text">Facebook Login</string>
 
-    <string name="emailpassword_status_fmt">Email User: %1$s (verified: %2$b)</string>
+    <string name="emailpassword_status_fmt">User: %1$s (verified: %2$b)</string>
     <string name="emailpassword_title_text">Welcome to Dare</string>
 
     <string name="error_sign_in_failed">Sign in failed, see logs for details.</string>

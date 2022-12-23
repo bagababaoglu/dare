@@ -222,7 +222,6 @@ public class EmailPasswordFragment extends BaseFragment {
         if (user != null) {
             mBinding.status.setText(getString(R.string.emailpassword_status_fmt,
                     user.getEmail(), user.isEmailVerified()));
-            mBinding.detail.setText(getString(R.string.firebase_status_fmt, user.getUid()));
 
             mBinding.emailPasswordButtons.setVisibility(View.GONE);
             mBinding.emailPasswordFields.setVisibility(View.GONE);
@@ -231,6 +230,7 @@ public class EmailPasswordFragment extends BaseFragment {
             if (user.isEmailVerified()) {
                 mBinding.verifyEmailButton.setVisibility(View.GONE);
             } else {
+                mBinding.detail.setText(R.string.user_instruction_verify);
                 mBinding.verifyEmailButton.setVisibility(View.VISIBLE);
             }
         } else {
