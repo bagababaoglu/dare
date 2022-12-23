@@ -20,7 +20,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -29,9 +28,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.salbe.dare.databinding.FragmentEmailpasswordBinding;
@@ -57,40 +53,19 @@ public class EmailPasswordFragment extends BaseFragment {
         setProgressBar(mBinding.progressBar);
 
         // Buttons
-        mBinding.emailSignInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String email = mBinding.fieldEmail.getText().toString();
-                String password = mBinding.fieldPassword.getText().toString();
-                signIn(email, password);
-            }
+        mBinding.emailSignInButton.setOnClickListener(v -> {
+            String email = mBinding.fieldEmail.getText().toString();
+            String password = mBinding.fieldPassword.getText().toString();
+            signIn(email, password);
         });
-        mBinding.emailCreateAccountButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String email = mBinding.fieldEmail.getText().toString();
-                String password = mBinding.fieldPassword.getText().toString();
-                createAccount(email, password);
-            }
+        mBinding.emailCreateAccountButton.setOnClickListener(v -> {
+            String email = mBinding.fieldEmail.getText().toString();
+            String password = mBinding.fieldPassword.getText().toString();
+            createAccount(email, password);
         });
-        mBinding.signOutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signOut();
-            }
-        });
-        mBinding.verifyEmailButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendEmailVerification();
-            }
-        });
-        mBinding.reloadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                reload();
-            }
-        });
+        mBinding.signOutButton.setOnClickListener(v -> signOut());
+        mBinding.verifyEmailButton.setOnClickListener(v -> sendEmailVerification());
+        mBinding.reloadButton.setOnClickListener(v -> reload());
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
@@ -101,7 +76,8 @@ public class EmailPasswordFragment extends BaseFragment {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
+        if (currentUser != null) {
+            updateUI(currentUser);
             onSuccess(currentUser);
         }
     }
@@ -115,24 +91,21 @@ public class EmailPasswordFragment extends BaseFragment {
         showProgressBar();
 
         mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(requireActivity(), new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "createUserWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(getContext(), "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                            updateUI(null);
-                        }
-
-                        hideProgressBar();
+                .addOnCompleteListener(requireActivity(), task -> {
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d(TAG, "createUserWithEmail:success");
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        updateUI(user);
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                        Toast.makeText(getContext(), "Authentication failed.",
+                                Toast.LENGTH_SHORT).show();
+                        updateUI(null);
                     }
+
+                    hideProgressBar();
                 });
     }
 
@@ -145,38 +118,37 @@ public class EmailPasswordFragment extends BaseFragment {
         showProgressBar();
 
         mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(requireActivity(), new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
-                            onSuccess(user);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(getContext(), "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                            updateUI(null);
-                        }
-
-                        if (!task.isSuccessful()) {
-                            mBinding.status.setText(R.string.auth_failed);
-                        }
-                        hideProgressBar();
+                .addOnCompleteListener(requireActivity(), task -> {
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d(TAG, "signInWithEmail:success");
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        updateUI(user);
+                        onSuccess(user);
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w(TAG, "signInWithEmail:failure", task.getException());
+                        Toast.makeText(getContext(), "Authentication failed.",
+                                Toast.LENGTH_SHORT).show();
+                        updateUI(null);
                     }
+
+                    if (!task.isSuccessful()) {
+                        mBinding.status.setText(R.string.auth_failed);
+                    }
+                    hideProgressBar();
                 });
     }
 
     private void onSuccess(FirebaseUser user) {
-        Bundle args = new Bundle();
-        args.putString(CardDisplayFragment.CURRENT_USER_UID, user.getUid());
-        NavHostFragment.findNavController(this)
-                .navigate(R.id.action_EmailPasswordFragment_to_cardDisplayFragment, args);
-
+        if (user != null && user.isEmailVerified()) {
+            Bundle args = new Bundle();
+            args.putString(CardDisplayFragment.CURRENT_USER_UID, user.getUid());
+            NavHostFragment.findNavController(this)
+                    .navigate(R.id.action_EmailPasswordFragment_to_cardDisplayFragment, args);
+        }
     }
+
     private void signOut() {
         mAuth.signOut();
         updateUI(null);
@@ -189,41 +161,36 @@ public class EmailPasswordFragment extends BaseFragment {
         // Send verification email
         final FirebaseUser user = mAuth.getCurrentUser();
         user.sendEmailVerification()
-                .addOnCompleteListener(requireActivity(), new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        // Re-enable button
-                        mBinding.verifyEmailButton.setEnabled(true);
+                .addOnCompleteListener(requireActivity(), task -> {
+                    // Re-enable button
+                    mBinding.verifyEmailButton.setEnabled(true);
 
-                        if (task.isSuccessful()) {
-                            Toast.makeText(getContext(),
-                                    "Verification email sent to " + user.getEmail(),
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
-                            Log.e(TAG, "sendEmailVerification", task.getException());
-                            Toast.makeText(getContext(),
-                                    "Failed to send verification email.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
+                    if (task.isSuccessful()) {
+                        Toast.makeText(getContext(),
+                                "Verification email sent to " + user.getEmail(),
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.e(TAG, "sendEmailVerification", task.getException());
+                        Toast.makeText(getContext(),
+                                "Failed to send verification email.",
+                                Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
     private void reload() {
-        mAuth.getCurrentUser().reload().addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    updateUI(mAuth.getCurrentUser());
-                    Toast.makeText(getContext(),
-                            "Reload successful!",
-                            Toast.LENGTH_SHORT).show();
-                } else {
-                    Log.e(TAG, "reload", task.getException());
-                    Toast.makeText(getContext(),
-                            "Failed to reload user.",
-                            Toast.LENGTH_SHORT).show();
-                }
+        mAuth.getCurrentUser().reload().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                updateUI(mAuth.getCurrentUser());
+                Toast.makeText(getContext(),
+                        "Reload successful!",
+                        Toast.LENGTH_SHORT).show();
+                onSuccess(mAuth.getCurrentUser());
+            } else {
+                Log.e(TAG, "reload", task.getException());
+                Toast.makeText(getContext(),
+                        "Failed to reload user.",
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
