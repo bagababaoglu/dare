@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "321970629415",
+    "project_id": "dare-7b4dc",
+    "storage_bucket": "dare-7b4dc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:321970629415:android:098a185616e6b95d119702",
+        "android_client_info": {
+          "package_name": "com.salbe.dare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "321970629415-joehpig9mar78er03qgcj75m249cph8l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_Tz8lag51BLSqIAr6pRqEUL_rszGEpxY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "321970629415-joehpig9mar78er03qgcj75m249cph8l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
